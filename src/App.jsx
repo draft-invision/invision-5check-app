@@ -238,8 +238,9 @@ export default function App(){
   })();},[]);
 
   var sU=async function(d){setUd(d);try{localStorage.setItem("iv5-session",d.email);localStorage.setItem("iv5-user",JSON.stringify(d));}catch(e){}try{await supabase.from("users").upsert(toRow(d));}catch(e){console.error("sU:",e);}};
-  var sM=async function(m){setMembers(m);try{localStorage.setItem("iv5-members",JSON.stringify(m));}catch(e){}try{if(m.length>0)await supabase.from("users").upsert(m.map(toRow));var {data:ex}=await supabase.from("users").select("email");if(ex){var keep=m.map(function(u){return u.email;});var del=ex.filter(function(r){return!keep.includes(r.email);}).map(function(r){return r.email;});if(del.length>0)await supabase.from("users").delete().in("email",del);}}catch(e){console.error("sM:",e);}};
+  var sM=async function(m){setMembers(m);try{localStorage.setItem("iv5-members",JSON.stringify(m));}catch(e){}try{if(m.length>0)await supabase.from("users").upsert(m.map(toRow));}catch(e){console.error("sM:",e);}};
   var sT=async function(t){setTeamsS(t);try{localStorage.setItem("iv5-teams",JSON.stringify(t));}catch(e){}try{await supabase.from("teams").delete().neq("name","__never__");if(t.length>0)await supabase.from("teams").insert(t.map(function(n){return{name:n};}));}catch(e){console.error("sT:",e);}};
+  var delUser=async function(email){try{await supabase.from("users").delete().eq("email",email);}catch(e){console.error("delUser:",e);}};
   var sync=function(u){var idx=members.findIndex(function(m){return m.email===u.email;});if(idx>=0){var ms=members.map(function(m,i){return i===idx?{...m,checks:u.checks,habitHistory:u.habitHistory}:m;});setMembers(ms);try{localStorage.setItem("iv5-members",JSON.stringify(ms));}catch(e){}}};
 
   var hLogin=async function(){
@@ -249,9 +250,11 @@ export default function App(){
       var {data:uRow}=await supabase.from("users").select("*").eq("email",email).maybeSingle();
       if(uRow){var d=toUser(uRow);await sU(d);setScreen(d.name&&d.habitHistory&&d.habitHistory.length>0?"check":"setup");}
       else{await sU({email:email,name:"",team:"",habitHistory:[],checks:{}});setScreen("setup");}
-      // 最新メンバーをリロード
+      // 最新メンバー・チームをリロード
       var {data:mRows}=await supabase.from("users").select("*");
-      if(mRows)setMembers(mRows.map(toUser));
+      if(mRows&&mRows.length>0)setMembers(mRows.map(toUser));
+      var {data:tRows}=await supabase.from("teams").select("name");
+      if(tRows&&tRows.length>0){var ts=tRows.map(function(r){return r.name;});setTeamsS(ts);localStorage.setItem("iv5-teams",JSON.stringify(ts));}
     }catch(e){
       var found=members.find(function(m){return m.email===email;});
       if(found){await sU({...found,email:email});setScreen("check");}
@@ -341,7 +344,7 @@ export default function App(){
       {screen==="check"&&ud&&<CheckScr ud={ud} aH={aH} onChk={hCheck} sm={sm} setSm={setSm}/>}
       {screen==="habits"&&ud&&<HabitsScr ud={ud} sU={sU} sync={sync} sm={sm}/>}
       {screen==="dashboard"&&<DashScr ud={ud} mem={members} sm={sm} setSm={setSm} filt={df} setFilt={setDf} selU={du} setSelU={setDu}/>}
-      {screen==="settings"&&<SetScr ud={ud} mem={members} sM={sM} teams={teams} sT={sT} sU={sU} setScr={setScreen} eidx={eidx} setEidx={setEidx} sm={sm} isAdmin={isAdmin}/>}
+      {screen==="settings"&&<SetScr ud={ud} mem={members} sM={sM} teams={teams} sT={sT} sU={sU} setScr={setScreen} eidx={eidx} setEidx={setEidx} sm={sm} isAdmin={isAdmin} delUser={delUser}/>}
     </div>
   );
 }
@@ -540,7 +543,7 @@ function DashScr(p){
 
 /* ═══ SETTINGS ═══ */
 function SetScr(p){
-  var ud=p.ud,mem=p.mem,sM=p.sM,teams=p.teams,sT=p.sT,sU=p.sU,setScr=p.setScr,eidx=p.eidx,setEidx=p.setEidx,sm=p.sm,isAdmin=p.isAdmin;
+  var ud=p.ud,mem=p.mem,sM=p.sM,teams=p.teams,sT=p.sT,sU=p.sU,setScr=p.setScr,eidx=p.eidx,setEidx=p.setEidx,sm=p.sm,isAdmin=p.isAdmin,delUser=p.delUser;
   var _nt=useState("");var nT=_nt[0],sNT=_nt[1];
   var _nn=useState("");var nN=_nn[0],sNN=_nn[1];
   var _ne=useState("");var nE=_ne[0],sNE=_ne[1];
@@ -577,7 +580,7 @@ function SetScr(p){
     var m2={name:nN.trim(),email:nE.trim(),team:nMT,habitHistory:[{periodKey:key,date:getToday(),habits:nH.map(function(h){return{...h};})}],checks:{}};
     sM(mem.concat([m2]));sNN("");sNE("");sNH(emptyHabits());
   };
-  var remMem=function(i){sM(mem.filter(function(_,j){return j!==i;}));};
+  var remMem=function(i){var removed=mem[i];sM(mem.filter(function(_,j){return j!==i;}));if(removed&&removed.email)delUser(removed.email);};
 
   return(
     <div style={st.mn} className="iv-mn"><div style={{maxWidth:600,margin:"0 auto"}}>
