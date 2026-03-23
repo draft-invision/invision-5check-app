@@ -319,7 +319,7 @@ export default function App(){
           <div className="iv-header-nav" style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:6,paddingBottom:6,flexWrap:"wrap",gap:4}}>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <img src={HIDANE} alt="" width="28" height="28"/>
-              <div><div style={{fontSize:14,fontWeight:900,color:"#1B4B8A"}}>行動習慣チェック</div><div style={{fontSize:8,color:"#8B7E6A"}}>株式会社インビジョン</div></div>
+              <div><div style={{fontSize:14,fontWeight:900,color:"#1B4B8A"}}>行動習慣チェック</div><div style={{fontSize:8,color:"#8B7E6A"}}>インビジョン株式会社</div></div>
             </div>
             <nav style={{display:"flex",gap:3,flexWrap:"wrap"}}>
               {["check","dashboard","habits","settings"].map(function(id){var lbs={check:"チェック",dashboard:"ダッシュボード",habits:"習慣管理",settings:"設定"};return <button key={id} onClick={function(){setScreen(id);}} style={{...st.nb,...(screen===id?st.na:{})}}>{lbs[id]}</button>;})}
@@ -332,7 +332,7 @@ export default function App(){
 
       {screen==="login"&&(
         <div style={st.ctr}><div style={st.lc}>
-          <div style={{textAlign:"center",marginBottom:14}}><NorenBar/><div style={{marginTop:10}}><img src={HIDANE} alt="" width="40" height="40"/></div><h1 style={{fontSize:20,fontWeight:900,color:"#1B4B8A",margin:"6px 0 2px"}}>行動習慣チェック</h1><p style={{fontSize:10,color:"#8B7E6A",margin:0}}>株式会社インビジョン</p></div>
+          <div style={{textAlign:"center",marginBottom:14}}><NorenBar/><div style={{marginTop:10}}><img src={HIDANE} alt="" width="40" height="40"/></div><h1 style={{fontSize:20,fontWeight:900,color:"#1B4B8A",margin:"6px 0 2px"}}>行動習慣チェック</h1><p style={{fontSize:10,color:"#8B7E6A",margin:0}}>インビジョン株式会社</p></div>
           <label style={st.lb}>メールアドレス</label>
           <input type="email" value={email} onChange={function(e){setEmail(e.target.value);}} placeholder="example@invision.co.jp" style={st.input} onKeyDown={function(e){if(e.key==="Enter")hLogin();}}/>
           <button onClick={hLogin} style={st.pb}>ログイン</button>
