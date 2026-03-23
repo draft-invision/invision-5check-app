@@ -289,8 +289,19 @@ export default function App(){
 
   var hLogout=function(){try{localStorage.removeItem("iv5-session");localStorage.removeItem("iv5-user");}catch(e){}setUd(null);setEmail("");setScreen("login");};
 
+  // 画面遷移時に共有データを最新化
+  useEffect(function(){
+    if(screen==="dashboard"||screen==="settings"){
+      (async function(){
+        try{var {data:mRows}=await supabase.from("users").select("*");if(mRows&&mRows.length>0){var ms=mRows.map(toUser);setMembers(ms);localStorage.setItem("iv5-members",JSON.stringify(ms));}}catch(e){}
+        try{var {data:tRows}=await supabase.from("teams").select("name");if(tRows&&tRows.length>0){var ts=tRows.map(function(r){return r.name;});setTeamsS(ts);localStorage.setItem("iv5-teams",JSON.stringify(ts));}}catch(e){}
+      })();
+    }
+  },[screen]);
+
   if(loading)return <div style={st.ctr}><p style={{color:"#8B7E6A",fontFamily:FF}}>読み込み中...</p></div>;
 
+  var isAdmin=!!(ud&&ud.email==="draft@invision-inc.jp");
   var aH=ud?getActiveHabits(ud,sm.year,sm.month):[];
 
   return(
@@ -330,7 +341,7 @@ export default function App(){
       {screen==="check"&&ud&&<CheckScr ud={ud} aH={aH} onChk={hCheck} sm={sm} setSm={setSm}/>}
       {screen==="habits"&&ud&&<HabitsScr ud={ud} sU={sU} sync={sync} sm={sm}/>}
       {screen==="dashboard"&&<DashScr ud={ud} mem={members} sm={sm} setSm={setSm} filt={df} setFilt={setDf} selU={du} setSelU={setDu}/>}
-      {screen==="settings"&&<SetScr ud={ud} mem={members} sM={sM} teams={teams} sT={sT} sU={sU} setScr={setScreen} eidx={eidx} setEidx={setEidx} sm={sm}/>}
+      {screen==="settings"&&<SetScr ud={ud} mem={members} sM={sM} teams={teams} sT={sT} sU={sU} setScr={setScreen} eidx={eidx} setEidx={setEidx} sm={sm} isAdmin={isAdmin}/>}
     </div>
   );
 }
@@ -529,7 +540,7 @@ function DashScr(p){
 
 /* ═══ SETTINGS ═══ */
 function SetScr(p){
-  var ud=p.ud,mem=p.mem,sM=p.sM,teams=p.teams,sT=p.sT,sU=p.sU,setScr=p.setScr,eidx=p.eidx,setEidx=p.setEidx,sm=p.sm;
+  var ud=p.ud,mem=p.mem,sM=p.sM,teams=p.teams,sT=p.sT,sU=p.sU,setScr=p.setScr,eidx=p.eidx,setEidx=p.setEidx,sm=p.sm,isAdmin=p.isAdmin;
   var _nt=useState("");var nT=_nt[0],sNT=_nt[1];
   var _nn=useState("");var nN=_nn[0],sNN=_nn[1];
   var _ne=useState("");var nE=_ne[0],sNE=_ne[1];
@@ -570,19 +581,19 @@ function SetScr(p){
 
   return(
     <div style={st.mn} className="iv-mn"><div style={{maxWidth:600,margin:"0 auto"}}>
-      <h2 style={st.tt}>⚙️ 設定（管理者）</h2>
+      <h2 style={st.tt}>{isAdmin?"⚙️ 設定（管理者）":"⚙️ 設定"}</h2>
       {emsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{emsg}</div>}
 
-      <div style={st.cd}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>チーム管理</h3><div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>{teams.map(function(t){return <span key={t} style={{background:"#1B4B8A",color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:10,display:"inline-flex",alignItems:"center",gap:3}}>{t}<button onClick={function(){remTeam(t);}} style={{background:"none",border:"none",color:"#fff",cursor:"pointer",fontSize:11,padding:0,lineHeight:1}}>×</button></span>;})}</div><div style={{display:"flex",gap:4}}><input value={nT} onChange={function(e){sNT(e.target.value);}} placeholder="新しいチーム名" style={{...st.input,flex:1,marginBottom:0}}/><button onClick={addTeam} style={{...st.pb,width:"auto",padding:"6px 14px",marginTop:0}}>追加</button></div></div>
+      <div style={st.cd}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>チーム管理</h3><div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>{teams.map(function(t){return <span key={t} style={{background:"#1B4B8A",color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:10,display:"inline-flex",alignItems:"center",gap:3}}>{t}{isAdmin&&<button onClick={function(){remTeam(t);}} style={{background:"none",border:"none",color:"#fff",cursor:"pointer",fontSize:11,padding:0,lineHeight:1}}>×</button>}</span>;})}</div>{isAdmin&&<div style={{display:"flex",gap:4}}><input value={nT} onChange={function(e){sNT(e.target.value);}} placeholder="新しいチーム名" style={{...st.input,flex:1,marginBottom:0}}/><button onClick={addTeam} style={{...st.pb,width:"auto",padding:"6px 14px",marginTop:0}}>追加</button></div>}</div>
 
-      <div style={{...st.cd,marginTop:10}}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>メンバー新規登録</h3>
+      {isAdmin&&<div style={{...st.cd,marginTop:10}}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>メンバー新規登録</h3>
         <label style={st.lb}>名前</label><input value={nN} onChange={function(e){sNN(e.target.value);}} placeholder="佐藤花子" style={st.input}/>
         <label style={st.lb}>メールアドレス</label><input type="email" value={nE} onChange={function(e){sNE(e.target.value);}} placeholder="sato@invision.co.jp" style={st.input}/>
         <label style={st.lb}>チーム</label><select value={nMT} onChange={function(e){sNMT(e.target.value);}} style={st.input}>{teams.map(function(t){return <option key={t} value={t}>{t}</option>;})}</select>
         <label style={st.lb}>行動習慣</label>
         <HabitEditor habits={nH} onChange={sNH}/>
         <button onClick={addMem} style={{...st.pb,marginTop:6}}>メンバーを登録</button>
-      </div>
+      </div>}
 
       {mem.length>0&&(
         <div style={{...st.cd,marginTop:10}}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>登録済みメンバー ({mem.length}人)</h3>
@@ -601,7 +612,7 @@ function SetScr(p){
               ):(
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                   <div><span style={{fontWeight:700,fontSize:12}}>{m2.name}</span><span style={{fontSize:9,color:"#8B7E6A",marginLeft:4}}>{m2.team}</span><span style={{fontSize:8,color:"#aaa",marginLeft:4}}>{m2.email}</span></div>
-                  <div style={{display:"flex",gap:4}}><button onClick={function(){startEdit(i);}} style={{background:"none",border:"1px solid #1B4B8A",borderRadius:3,color:"#1B4B8A",cursor:"pointer",fontSize:9,padding:"1px 6px"}}>編集</button><button onClick={function(){remMem(i);}} style={{background:"none",border:"1px solid #ddd",borderRadius:3,color:"#999",cursor:"pointer",fontSize:9,padding:"1px 6px"}}>削除</button></div>
+                  {isAdmin&&<div style={{display:"flex",gap:4}}><button onClick={function(){startEdit(i);}} style={{background:"none",border:"1px solid #1B4B8A",borderRadius:3,color:"#1B4B8A",cursor:"pointer",fontSize:9,padding:"1px 6px"}}>編集</button><button onClick={function(){remMem(i);}} style={{background:"none",border:"1px solid #ddd",borderRadius:3,color:"#999",cursor:"pointer",fontSize:9,padding:"1px 6px"}}>削除</button></div>}
                 </div>
               )}
             </div>;
