@@ -248,7 +248,7 @@ export default function App(){
   var sync=function(u){var idx=members.findIndex(function(m){return m.email===u.email;});if(idx>=0){var ms=members.map(function(m,i){return i===idx?{...m,checks:u.checks,habitHistory:u.habitHistory}:m;});setMembers(ms);try{localStorage.setItem("iv5-members",JSON.stringify(ms));}catch(e){}}};
 
   var hLogin=async function(){
-    if(!email.includes("@"))return;
+    if(!email.endsWith("@invision-inc.jp"))return;
     setLoading(true);
     try{
       var {data:uRow}=await supabase.from("users").select("*").eq("email",email).maybeSingle();
@@ -338,8 +338,8 @@ export default function App(){
         <div style={st.ctr}><div style={st.lc}>
           <div style={{textAlign:"center",marginBottom:14}}><NorenBar/><div style={{marginTop:10}}><img src={HIDANE} alt="" width="40" height="40"/></div><h1 style={{fontSize:20,fontWeight:900,color:"#1B4B8A",margin:"6px 0 2px"}}>行動習慣チェック</h1><p style={{fontSize:10,color:"#8B7E6A",margin:0}}>インビジョン株式会社</p></div>
           <label style={st.lb}>メールアドレス</label>
-          <input type="email" value={email} onChange={function(e){setEmail(e.target.value);}} placeholder="example@invision.co.jp" style={st.input} onKeyDown={function(e){if(e.key==="Enter")hLogin();}}/>
-          <button onClick={hLogin} style={st.pb}>ログイン</button>
+          <input type="email" value={email} onChange={function(e){setEmail(e.target.value);}} placeholder="" style={st.input} onKeyDown={function(e){if(e.key==="Enter")hLogin();}}/>
+          <button onClick={hLogin} disabled={!email.endsWith("@invision-inc.jp")} style={{...st.pb,opacity:email.endsWith("@invision-inc.jp")?1:0.4}}>ログイン</button>
           <p style={{fontSize:9,color:"#aaa",textAlign:"center",marginTop:6}}>※本人のみチェック可能</p>
         </div></div>
       )}
