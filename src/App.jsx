@@ -23,6 +23,11 @@ function mDays(y,m){ var r=[]; for(var i=1;i<=dim(y,m);i++) r.push(y+"-"+String(
 function fDow(y,m){ return new Date(y,m,1).getDay(); }
 function pKey(y,m){ return y+"-"+String(m+1).padStart(2,"0"); }
 function pLabel(k){ var p=k.split("-"); return p[0]+"年"+parseInt(p[1])+"月"; }
+function getHabitPeriodLabel(freq,y,m){
+  if(freq==="quarterly"){var qs=Math.floor(m/3)*3;return y+"年"+(qs+1)+"月〜"+(qs+3)+"月分";}
+  if(freq==="yearly"){var fy=m>=3?y:y-1;return fy+"年4月〜"+(fy+1)+"年3月分";}
+  return null;
+}
 function dayDow(d){ var p=d.split("-"); return DOW[new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])).getDay()]; }
 
 function getActiveHabits(user,y,m){
@@ -80,12 +85,11 @@ function calcRate(checks,idx,freq,count,y,m){
     return Math.min(100,Math.round((done4/c)*100));
   }
   if(freq==="yearly"){
-    // Count checks across all 12 months of this year
+    // Count checks across fiscal year (Apr 1 to Mar 31)
+    var fyStart=m>=3?y:y-1;
     var done5=0;
-    for(var ym=0;ym<12;ym++){
-      var yDays=mDays(y,ym);
-      yDays.forEach(function(d){if(d<=td&&checks&&checks[idx+"-"+d])done5++;});
-    }
+    for(var ym2=3;ym2<12;ym2++){var yDays2=mDays(fyStart,ym2);yDays2.forEach(function(d){if(d<=td&&checks&&checks[idx+"-"+d])done5++;});}
+    for(var ym3=0;ym3<3;ym3++){var yDays3=mDays(fyStart+1,ym3);yDays3.forEach(function(d){if(d<=td&&checks&&checks[idx+"-"+d])done5++;});}
     if(c<=0)return 0;
     return Math.min(100,Math.round((done5/c)*100));
   }
@@ -392,12 +396,14 @@ function CheckScr(p){
         var hi=rate>=80; var fq=FREQS.find(function(f){return f.value===hab.freq;});
         var freqLabel=fq?fq.label:"";
         if(hab.freq!=="daily"&&hab.count>1) freqLabel+=hab.count+"回";
+        var periodLabel=getHabitPeriodLabel(hab.freq,y,m);
         return(
           <div key={i} style={{...st.cd,marginBottom:10,animation:"fadeIn 0.25s "+(i*0.05)+"s both"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:periodLabel?2:5}}>
               <div style={{display:"flex",alignItems:"center",gap:5}}><span style={st.hn}>{i+1}</span><span style={{fontWeight:700,fontSize:13}}>{hab.name}</span><span style={{fontSize:9,color:"#8B7E6A",background:"#f0ede5",padding:"1px 5px",borderRadius:5}}>{freqLabel}</span></div>
               <div style={{fontWeight:900,fontSize:15,color:hi?"#C41E1E":"#1B4B8A",animation:hi?"pulse80 1s infinite":"none"}}>{rate}%</div>
             </div>
+            {periodLabel&&<div style={{fontSize:9,color:"#8B7E6A",marginBottom:5}}>📅 集計期間：{periodLabel}</div>}
             <div style={{height:5,background:"#f0ede5",borderRadius:3,marginBottom:8,overflow:"hidden"}}><div style={{height:"100%",width:rate+"%",background:hi?"linear-gradient(90deg,#C41E1E,#E8A83E)":"linear-gradient(90deg,#1B4B8A,#3A7BD5)",borderRadius:3,transition:"width 0.5s"}}/></div>
             <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
               {ckDays.map(function(d){
@@ -527,7 +533,8 @@ function DashScr(p){
                 {hs.map(function(h,hi){
                   var fq=FREQS.find(function(f){return f.value===h.freq;});var fl2=fq?fq.label:"";if(h.freq!=="daily"&&h.count>1)fl2+=h.count+"回";
                   var hR=calcRate(u.checks||{},hi,h.freq,h.count||1,y,m);var hH=hR>=80;
-                  return <div key={hi} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 0",borderBottom:hi<hs.length-1?"1px solid #e8e3d8":"none"}}><span style={{...st.hn,width:18,height:18,fontSize:8}}>{hi+1}</span><span style={{fontSize:11,flex:1}}>{h.name}</span><span style={{fontSize:9,color:"#8B7E6A"}}>{fl2}</span><span style={{fontWeight:900,fontSize:12,minWidth:36,textAlign:"right",color:hH?"#C41E1E":"#1B4B8A",animation:hH?"pulse80 1s infinite":"none"}}>{hR}%</span></div>;
+                  var pl2=getHabitPeriodLabel(h.freq,y,m);
+                  return <div key={hi} style={{padding:"4px 0",borderBottom:hi<hs.length-1?"1px solid #e8e3d8":"none"}}><div style={{display:"flex",alignItems:"center",gap:5}}><span style={{...st.hn,width:18,height:18,fontSize:8}}>{hi+1}</span><span style={{fontSize:11,flex:1}}>{h.name}</span><span style={{fontSize:9,color:"#8B7E6A"}}>{fl2}</span><span style={{fontWeight:900,fontSize:12,minWidth:36,textAlign:"right",color:hH?"#C41E1E":"#1B4B8A",animation:hH?"pulse80 1s infinite":"none"}}>{hR}%</span></div>{pl2&&<div style={{fontSize:8,color:"#aaa",paddingLeft:26}}>📅 {pl2}</div>}</div>;
                 })}
               </div>
             )}
