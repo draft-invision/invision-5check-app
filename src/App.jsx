@@ -219,6 +219,7 @@ export default function App(){
       try{
         var {data:uRow}=await supabase.from("users").select("*").eq("email",savedEmail).maybeSingle();
         if(uRow){var d=toUser(uRow);setUd(d);setEmail(savedEmail);setScreen(d.name&&d.habitHistory&&d.habitHistory.length>0?"check":"setup");}
+        else{var r=localStorage.getItem("iv5-user");if(r){var d=JSON.parse(r);setUd(d);setEmail(d.email||"");setScreen(d.name&&d.habitHistory&&d.habitHistory.length>0?"check":"setup");}}
       }catch(e){var r=localStorage.getItem("iv5-user");if(r){var d=JSON.parse(r);setUd(d);setEmail(d.email||"");setScreen(d.name&&d.habitHistory&&d.habitHistory.length>0?"check":"setup");}}
     }
     // ② 全メンバー取得
