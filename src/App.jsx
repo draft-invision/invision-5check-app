@@ -343,7 +343,7 @@ function SetupScr(p){
   var _h=useState(existing.length>0?existing.map(function(x){return{...x};}):emptyHabits());var habits=_h[0],sH=_h[1];
   var ok=name.trim()&&habits.every(function(h){return h.name.trim();});
   return(
-    <div style={st.mn}><div style={{maxWidth:560,margin:"0 auto",animation:"fadeIn 0.5s"}}>
+    <div style={st.mn} className="iv-mn"><div style={{maxWidth:560,margin:"0 auto",animation:"fadeIn 0.5s"}}>
       <h2 style={st.tt}>プロフィール設定</h2>
       <div style={st.cd}><label style={st.lb}>名前</label><input value={name} onChange={function(e){sN(e.target.value);}} placeholder="山田太郎" style={st.input}/><label style={st.lb}>チーム</label><select value={team} onChange={function(e){sT(e.target.value);}} style={st.input}>{teams.map(function(t){return <option key={t} value={t}>{t}</option>;})}</select></div>
       <h3 style={{fontSize:14,fontWeight:700,color:"#1B4B8A",margin:"14px 0 6px"}}>🔥 {pLabel(pKey(sm.year,sm.month))} の行動習慣</h3>
@@ -363,7 +363,7 @@ function CheckScr(p){
   var avg=userAvgRate(ud,y,m);
 
   return(
-    <div style={st.mn}><div style={{maxWidth:700,margin:"0 auto"}}>
+    <div style={st.mn} className="iv-mn"><div style={{maxWidth:700,margin:"0 auto"}}>
       <div style={{...st.cd,display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
         <div style={{width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#C41E1E,#E8A83E)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:900,fontSize:16}}>{ud.name?ud.name[0]:"?"}</div>
         <div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{ud.name}</div><div style={{fontSize:10,color:"#8B7E6A"}}>{ud.team} · {pLabel(pKey(y,m))}</div></div>
@@ -425,7 +425,7 @@ function HabitsScr(p){
   };
 
   return(
-    <div style={st.mn}><div style={{maxWidth:600,margin:"0 auto"}}>
+    <div style={st.mn} className="iv-mn"><div style={{maxWidth:600,margin:"0 auto"}}>
       <h2 style={st.tt}>📋 習慣管理</h2>
       {msg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{msg}</div>}
 
@@ -480,7 +480,7 @@ function DashScr(p){
   var gCC=function(u,d){var hs=getActiveHabits(u,y,m);return hs.filter(function(_,i){return u.checks&&u.checks[i+"-"+d];}).length;};
 
   return(
-    <div style={st.mn}><div style={{maxWidth:860,margin:"0 auto"}}>
+    <div style={st.mn} className="iv-mn"><div style={{maxWidth:860,margin:"0 auto"}}>
       <h2 style={st.tt}>📊 全社ダッシュボード</h2>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:14}}>
         <MNav year={y} month={m} onChange={setSm}/>
@@ -568,7 +568,7 @@ function SetScr(p){
   var remMem=function(i){sM(mem.filter(function(_,j){return j!==i;}));};
 
   return(
-    <div style={st.mn}><div style={{maxWidth:600,margin:"0 auto"}}>
+    <div style={st.mn} className="iv-mn"><div style={{maxWidth:600,margin:"0 auto"}}>
       <h2 style={st.tt}>⚙️ 設定（管理者）</h2>
       {emsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{emsg}</div>}
 
@@ -614,7 +614,7 @@ function SetScr(p){
 
 var st={
   ctr:{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",padding:16,background:"linear-gradient(180deg,#F5F0E1,#EDE7D6)"},
-  mn:{padding:"16px 14px 50px"},
+  mn:{paddingTop:16,paddingBottom:50},
   tt:{fontSize:18,fontWeight:900,color:"#1B4B8A",marginBottom:8},
   cd:{background:"#fff",borderRadius:10,padding:12,marginBottom:12,boxShadow:"0 1px 8px rgba(0,0,0,0.04)",border:"1px solid #e8e3d8",position:"relative"},
   lc:{background:"#fff",borderRadius:14,padding:28,maxWidth:360,width:"100%",boxShadow:"0 6px 30px rgba(27,75,138,0.1)",border:"1px solid #e8e3d8"},
