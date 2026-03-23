@@ -489,7 +489,7 @@ function HabitsScr(p){
 function DashScr(p){
   var ud=p.ud,mem=p.mem,sm=p.sm,setSm=p.setSm,filt=p.filt,setFilt=p.setFilt,selU=p.selU,setSelU=p.setSelU;
   var y=sm.year,m=sm.month,td=getToday(),days=mDays(y,m),fd=fDow(y,m);
-  var allU=[{...(ud||{}),isMe:true,name:(ud&&ud.name)||"あなた"}].concat(mem.map(function(x){return{...x,isMe:false};}));
+  var allU=[{...(ud||{}),isMe:true,name:(ud&&ud.name)||"あなた"}].concat(mem.filter(function(x){return x.email!==(ud&&ud.email);}).map(function(x){return{...x,isMe:false};}));
   var uT=[];allU.forEach(function(u){if(u.team&&uT.indexOf(u.team)===-1)uT.push(u.team);});
   var fl=filt==="all"?allU:allU.filter(function(u){return u.team===filt;});
   var gCC=function(u,d){var hs=getActiveHabits(u,y,m);return hs.filter(function(_,i){return u.checks&&u.checks[i+"-"+d];}).length;};
