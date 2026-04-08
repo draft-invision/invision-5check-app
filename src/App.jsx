@@ -561,6 +561,8 @@ function SetScr(p){
   var _et=useState("");var et=_et[0],sET=_et[1];
   var _eh=useState(emptyHabits());var eh=_eh[0],sEH=_eh[1];
   var _emsg=useState("");var emsg=_emsg[0],sEmsg=_emsg[1];
+  var _etold=useState(null);var etOld=_etold[0],sEtOld=_etold[1];
+  var _etnew=useState("");var etNew=_etnew[0],sEtNew=_etnew[1];
 
   var startEdit=function(i){
     var m2=mem[i];setEidx(i);sEN(m2.name||"");sET(m2.team||teams[0]);
@@ -581,6 +583,13 @@ function SetScr(p){
 
   var addTeam=function(){if(nT.trim()&&teams.indexOf(nT.trim())===-1){sT(teams.concat([nT.trim()]));sNT("");}};
   var remTeam=function(t){sT(teams.filter(function(x){return x!==t;}));};
+  var renameTeam=function(oldName,newName){
+    var n=newName.trim();
+    if(!n||n===oldName||teams.indexOf(n)!==-1)return;
+    sT(teams.map(function(t){return t===oldName?n:t;}));
+    sM(mem.map(function(m2){return m2.team===oldName?{...m2,team:n}:m2;}));
+    sEtOld(null);sEtNew("");
+  };
   var addMem=function(){
     if(!nN.trim()||!nE.includes("@")||!nH.every(function(h){return h.name.trim();}))return;
     var key=pKey(sm.year,sm.month);
@@ -594,7 +603,7 @@ function SetScr(p){
       <h2 style={st.tt}>{isAdmin?"⚙️ 設定（管理者）":"⚙️ 設定"}</h2>
       {emsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{emsg}</div>}
 
-      <div style={st.cd}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>チーム管理</h3><div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>{teams.map(function(t){return <span key={t} style={{background:"#1B4B8A",color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:10,display:"inline-flex",alignItems:"center",gap:3}}>{t}{isAdmin&&<button onClick={function(){remTeam(t);}} style={{background:"none",border:"none",color:"#fff",cursor:"pointer",fontSize:11,padding:0,lineHeight:1}}>×</button>}</span>;})}</div>{isAdmin&&<div style={{display:"flex",gap:4}}><input value={nT} onChange={function(e){sNT(e.target.value);}} placeholder="新しいチーム名" style={{...st.input,flex:1,marginBottom:0}}/><button onClick={addTeam} style={{...st.pb,width:"auto",padding:"6px 14px",marginTop:0}}>追加</button></div>}</div>
+      <div style={st.cd}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>チーム管理</h3><div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>{teams.map(function(t){return etOld===t?(<div key={t} style={{display:"inline-flex",alignItems:"center",gap:3}}><input value={etNew} onChange={function(e){sEtNew(e.target.value);}} onKeyDown={function(e){if(e.key==="Enter")renameTeam(t,etNew);if(e.key==="Escape"){sEtOld(null);sEtNew("");}}} style={{...st.input,marginBottom:0,padding:"1px 6px",fontSize:10,width:90}}/><button onClick={function(){renameTeam(t,etNew);}} style={{background:"#1B4B8A",border:"none",color:"#fff",cursor:"pointer",fontSize:10,padding:"2px 6px",borderRadius:4}}>保存</button><button onClick={function(){sEtOld(null);sEtNew("");}} style={{background:"#999",border:"none",color:"#fff",cursor:"pointer",fontSize:10,padding:"2px 6px",borderRadius:4}}>✕</button></div>):(<span key={t} style={{background:"#1B4B8A",color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:10,display:"inline-flex",alignItems:"center",gap:3}}>{t}{isAdmin&&<button onClick={function(){sEtOld(t);sEtNew(t);}} style={{background:"none",border:"none",color:"#ddd",cursor:"pointer",fontSize:10,padding:0,lineHeight:1}} title="チーム名を変更">✏</button>}{isAdmin&&<button onClick={function(){remTeam(t);}} style={{background:"none",border:"none",color:"#fff",cursor:"pointer",fontSize:11,padding:0,lineHeight:1}}>×</button>}</span>);})}</div>{isAdmin&&<div style={{display:"flex",gap:4}}><input value={nT} onChange={function(e){sNT(e.target.value);}} placeholder="新しいチーム名" style={{...st.input,flex:1,marginBottom:0}}/><button onClick={addTeam} style={{...st.pb,width:"auto",padding:"6px 14px",marginTop:0}}>追加</button></div>}</div>
 
       {isAdmin&&<div style={{...st.cd,marginTop:10}}><h3 style={{fontSize:13,fontWeight:700,color:"#1B4B8A",marginBottom:6}}>メンバー新規登録</h3>
         <label style={st.lb}>名前</label><input value={nN} onChange={function(e){sNN(e.target.value);}} placeholder="佐藤花子" style={st.input}/>
