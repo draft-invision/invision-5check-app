@@ -326,7 +326,7 @@ export default function App(){
               <div><div style={{fontSize:14,fontWeight:900,color:"#1B4B8A"}}>行動習慣JOBTRIP</div><div style={{fontSize:8,color:"#8B7E6A"}}>インビジョン株式会社</div></div>
             </div>
             <nav style={{display:"flex",gap:3,flexWrap:"wrap"}}>
-              {["check","dashboard","habits","settings"].map(function(id){var lbs={check:"チェック",dashboard:"ダッシュボード",habits:"習慣管理",settings:"設定"};return <button key={id} onClick={function(){setScreen(id);}} style={{...st.nb,...(screen===id?st.na:{})}}>{lbs[id]}</button>;})}
+              {["jobtrip","check","dashboard","habits","settings"].map(function(id){var lbs={jobtrip:"JOBTRIPとは？",check:"チェック",dashboard:"ダッシュボード",habits:"習慣管理",settings:"設定"};return <button key={id} onClick={function(){setScreen(id);}} style={{...st.nb,...(screen===id?st.na:{})}}>{lbs[id]}</button>;})}
               <button onClick={hLogout} style={{...st.nb,color:"#aaa",fontSize:9}}>ログアウト</button>
             </nav>
           </div>
@@ -344,12 +344,64 @@ export default function App(){
         </div></div>
       )}
 
+      {screen==="jobtrip"&&<JobtripScr isAdmin={isAdmin}/>}
       {screen==="setup"&&<SetupScr ud={ud} teams={teams} onSetup={hSetup} sm={sm}/>}
       {screen==="check"&&ud&&<CheckScr ud={ud} aH={aH} onChk={hCheck} sm={sm} setSm={setSm}/>}
       {screen==="habits"&&ud&&<HabitsScr ud={ud} sU={sU} sync={sync} sm={sm}/>}
       {screen==="dashboard"&&<DashScr ud={ud} mem={members} sm={sm} setSm={setSm} filt={df} setFilt={setDf} selU={du} setSelU={setDu}/>}
       {screen==="settings"&&<SetScr ud={ud} mem={members} sM={sM} teams={teams} sT={sT} sU={sU} setScr={setScreen} eidx={eidx} setEidx={setEidx} sm={sm} isAdmin={isAdmin} delUser={delUser}/>}
     </div>
+  );
+}
+
+/* ═══ JOBTRIP ═══ */
+function JobtripScr(p){
+  var isAdmin=p.isAdmin;
+  var editorRef=useRef(null);
+  var _smsg=useState("");var smsg=_smsg[0],setSMsg=_smsg[1];
+
+  useEffect(function(){
+    if(editorRef.current){
+      var saved=localStorage.getItem("iv5-jobtrip");
+      editorRef.current.innerHTML=saved||"<h2>JOBTRIPとは？</h2><p>ここに内容を入力してください。</p>";
+    }
+  },[]);
+
+  var execCmd=function(cmd,val){document.execCommand(cmd,false,val||null);editorRef.current&&editorRef.current.focus();};
+
+  var saveContent=function(){
+    if(editorRef.current){
+      localStorage.setItem("iv5-jobtrip",editorRef.current.innerHTML);
+      setSMsg("✅ 保存しました");setTimeout(function(){setSMsg("");},2000);
+    }
+  };
+
+  var COLORS=[["#000000","黒"],["#1B4B8A","青"],["#C41E1E","赤"],["#2e7d32","緑"],["#e65100","橙"],["#8B7E6A","茶"]];
+
+  var tbBtn=function(label,onClick,extra){return <button onClick={onClick} style={{border:"1px solid #ddd",borderRadius:4,cursor:"pointer",padding:"3px 8px",fontSize:11,fontFamily:"inherit",background:"#fff",color:"#333",...(extra||{})}}>{label}</button>;};
+
+  return(
+    <div style={st.mn} className="iv-mn"><div>
+      <h2 style={st.tt}>JOBTRIPとは？</h2>
+      {smsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{smsg}</div>}
+      {isAdmin&&(
+        <div style={{...st.cd,marginBottom:8}}>
+          <div style={{fontSize:10,fontWeight:700,color:"#8B7E6A",marginBottom:6}}>書式ツールバー（管理者のみ）</div>
+          <div style={{display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
+            {tbBtn("B",function(){execCmd("bold");},{fontWeight:900})}
+            {tbBtn("見出し1",function(){execCmd("formatBlock","h1");})}
+            {tbBtn("見出し2",function(){execCmd("formatBlock","h2");})}
+            {tbBtn("本文",function(){execCmd("formatBlock","p");})}
+            <span style={{color:"#8B7E6A",fontSize:10}}>色：</span>
+            {COLORS.map(function(c){return <button key={c[0]} onClick={function(){execCmd("foreColor",c[0]);}} style={{background:c[0],color:"#fff",border:"none",borderRadius:3,cursor:"pointer",padding:"3px 7px",fontSize:10}}>{c[1]}</button>;})}
+          </div>
+        </div>
+      )}
+      <div style={st.cd}>
+        <div ref={editorRef} contentEditable={isAdmin} suppressContentEditableWarning={true} style={{minHeight:300,outline:"none",fontSize:13,lineHeight:2,color:"#333",wordBreak:"break-word"}}/>
+      </div>
+      {isAdmin&&<button onClick={saveContent} style={st.pb}>保存</button>}
+    </div></div>
   );
 }
 
