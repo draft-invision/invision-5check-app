@@ -109,14 +109,16 @@ function BirdMascot(p){
   var monthKey=y+"-"+m;
   var showArr=useState(false);
   var show=showArr[0],setShow=showArr[1];
+  var prevThrRef=useRef(-1);
   function getThr(a){return a>=100?100:a>=90?90:a>=70?70:a>=50?50:a>=20?20:0;}
   useEffect(function(){
+    if(prevThrRef.current===-1){
+      prevThrRef.current=parseInt(localStorage.getItem("iv5-bird-"+monthKey)||"0");
+    }
     var thr=getThr(avg);
-    if(thr===0)return;
-    var key="iv5-bird-"+monthKey;
-    var stored=parseInt(localStorage.getItem(key)||"0");
-    if(thr>stored){
-      localStorage.setItem(key,String(thr));
+    if(thr>prevThrRef.current){
+      localStorage.setItem("iv5-bird-"+monthKey,String(thr));
+      prevThrRef.current=thr;
       setShow(true);
     }
   },[avg,monthKey]);
@@ -130,11 +132,10 @@ function BirdMascot(p){
     <div style={{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"center",flexShrink:0}}>
       <style>{"@keyframes birdFly{0%{transform:translateY(0px) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}100%{transform:translateY(0px) rotate(-3deg)}}"}</style>
       {show&&msg&&(
-        <div style={{position:"absolute",bottom:"105%",right:0,background:"#fff",border:"2px solid #C41E1E",borderRadius:10,padding:"10px 12px 8px",fontSize:10,color:"#333",width:150,textAlign:"center",zIndex:10,boxShadow:"0 3px 10px rgba(0,0,0,0.18)",lineHeight:1.6,whiteSpace:"normal"}}>
+        <div style={{position:"fixed",bottom:80,right:12,background:"#fff",border:"2px solid #C41E1E",borderRadius:12,padding:"12px 14px 10px",fontSize:11,color:"#333",width:190,textAlign:"center",zIndex:9999,boxShadow:"0 4px 16px rgba(0,0,0,0.22)",lineHeight:1.7}}>
+          <div style={{fontSize:10,color:"#C41E1E",fontWeight:700,marginBottom:5}}>ヒダネ鳥より</div>
           {msg}
-          <div style={{position:"absolute",bottom:-11,right:24,width:0,height:0,borderLeft:"9px solid transparent",borderRight:"9px solid transparent",borderTop:"11px solid #C41E1E"}}/>
-          <div style={{position:"absolute",bottom:-8,right:26,width:0,height:0,borderLeft:"7px solid transparent",borderRight:"7px solid transparent",borderTop:"9px solid #fff"}}/>
-          <button onClick={function(){setShow(false);}} style={{position:"absolute",top:4,right:6,background:"none",border:"none",cursor:"pointer",fontSize:11,color:"#bbb",lineHeight:1,padding:0}}>✕</button>
+          <button onClick={function(){setShow(false);}} style={{position:"absolute",top:6,right:8,background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#bbb",lineHeight:1,padding:0}}>✕</button>
         </div>
       )}
       <img
