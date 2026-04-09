@@ -109,16 +109,16 @@ function BirdMascot(p){
   var monthKey=y+"-"+m;
   var showArr=useState(false);
   var show=showArr[0],setShow=showArr[1];
-  var prevThrRef=useRef(-1);
+  var prevThrRef=useRef({key:"",thr:0});
   function getThr(a){return a>=100?100:a>=90?90:a>=70?70:a>=50?50:a>=20?20:0;}
   useEffect(function(){
-    if(prevThrRef.current===-1){
-      prevThrRef.current=parseInt(localStorage.getItem("iv5-bird-"+monthKey)||"0");
-    }
+    var ref=prevThrRef.current;
+    if(ref.key!==monthKey){ref.key=monthKey;ref.thr=0;}
     var thr=getThr(avg);
-    if(thr>prevThrRef.current){
+    var stored=parseInt(localStorage.getItem("iv5-bird-"+monthKey)||"0");
+    if(thr>ref.thr&&thr>stored){
       localStorage.setItem("iv5-bird-"+monthKey,String(thr));
-      prevThrRef.current=thr;
+      ref.thr=thr;
       setShow(true);
     }
   },[avg,monthKey]);
