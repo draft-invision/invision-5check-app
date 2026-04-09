@@ -107,12 +107,19 @@ function userAvgRate(user,y,m){
 function BirdMascot(p){
   var avg=p.avg,y=p.y,m=p.m;
   var monthKey=y+"-"+m;
-  var showArr=useState(function(){
-    var shown=localStorage.getItem("iv5-bird")===monthKey;
-    if(!shown&&avg>=20){localStorage.setItem("iv5-bird",monthKey);return true;}
-    return false;
-  });
+  var showArr=useState(false);
   var show=showArr[0],setShow=showArr[1];
+  function getThr(a){return a>=100?100:a>=90?90:a>=70?70:a>=50?50:a>=20?20:0;}
+  useEffect(function(){
+    var thr=getThr(avg);
+    if(thr===0)return;
+    var key="iv5-bird-"+monthKey;
+    var stored=parseInt(localStorage.getItem(key)||"0");
+    if(thr>stored){
+      localStorage.setItem(key,String(thr));
+      setShow(true);
+    }
+  },[avg,monthKey]);
   var msg=avg>=100?"目標達成、おめでとうございます！！"
     :avg>=90?"ラストスパート！気を抜かずもうひと踏ん張り頑張ってください！"
     :avg>=70?"ゴールが見えてきました！ここが踏ん張りどころです！"
@@ -123,10 +130,10 @@ function BirdMascot(p){
     <div style={{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"center",flexShrink:0}}>
       <style>{"@keyframes birdFly{0%{transform:translateY(0px) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}100%{transform:translateY(0px) rotate(-3deg)}}"}</style>
       {show&&msg&&(
-        <div style={{position:"absolute",right:"110%",top:"50%",transform:"translateY(-50%)",background:"#fff",border:"2px solid #C41E1E",borderRadius:10,padding:"10px 12px 8px",fontSize:10,color:"#333",width:150,textAlign:"center",zIndex:10,boxShadow:"0 3px 10px rgba(0,0,0,0.18)",lineHeight:1.6,whiteSpace:"normal"}}>
+        <div style={{position:"absolute",bottom:"105%",right:0,background:"#fff",border:"2px solid #C41E1E",borderRadius:10,padding:"10px 12px 8px",fontSize:10,color:"#333",width:150,textAlign:"center",zIndex:10,boxShadow:"0 3px 10px rgba(0,0,0,0.18)",lineHeight:1.6,whiteSpace:"normal"}}>
           {msg}
-          <div style={{position:"absolute",right:-11,top:"50%",transform:"translateY(-50%)",width:0,height:0,borderTop:"9px solid transparent",borderBottom:"9px solid transparent",borderLeft:"11px solid #C41E1E"}}/>
-          <div style={{position:"absolute",right:-8,top:"50%",transform:"translateY(-50%)",width:0,height:0,borderTop:"7px solid transparent",borderBottom:"7px solid transparent",borderLeft:"9px solid #fff"}}/>
+          <div style={{position:"absolute",bottom:-11,right:24,width:0,height:0,borderLeft:"9px solid transparent",borderRight:"9px solid transparent",borderTop:"11px solid #C41E1E"}}/>
+          <div style={{position:"absolute",bottom:-8,right:26,width:0,height:0,borderLeft:"7px solid transparent",borderRight:"7px solid transparent",borderTop:"9px solid #fff"}}/>
           <button onClick={function(){setShow(false);}} style={{position:"absolute",top:4,right:6,background:"none",border:"none",cursor:"pointer",fontSize:11,color:"#bbb",lineHeight:1,padding:0}}>✕</button>
         </div>
       )}
@@ -504,13 +511,15 @@ function CheckScr(p){
           </div>
         );
       })}
-      <div style={{display:"flex",alignItems:"center",marginTop:14,gap:0}}>
-        <div style={{...st.cd,flex:1,marginBottom:0,textAlign:"center"}}>
-          <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4}}>今月の平均達成率</div>
-          <PersonFigure rate={avg} size={50} dance={avg>=100}/>
-          <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
+      <div style={{...st.cd,marginTop:14,textAlign:"center"}}>
+        <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4}}>今月の平均達成率</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16}}>
+          <div>
+            <PersonFigure rate={avg} size={50} dance={avg>=100}/>
+            <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
+          </div>
+          <BirdMascot avg={avg} y={y} m={m}/>
         </div>
-        <BirdMascot avg={avg} y={y} m={m}/>
       </div>
     </div></div>
   );
