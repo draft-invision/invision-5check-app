@@ -513,11 +513,9 @@ function CheckScr(p){
       })}
       <div style={{...st.cd,marginTop:14,textAlign:"center"}}>
         <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4}}>今月の平均達成率</div>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16}}>
-          <div>
-            <PersonFigure rate={avg} size={50} dance={avg>=100}/>
-            <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
-          </div>
+        <PersonFigure rate={avg} size={50} dance={avg>=100}/>
+        <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
+        <div style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)"}}>
           <BirdMascot avg={avg} y={y} m={m}/>
         </div>
       </div>
