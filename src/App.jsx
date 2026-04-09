@@ -127,9 +127,11 @@ function BirdMascot(p){
     <div style={{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"center",flexShrink:0}}>
       <style>{"@keyframes birdFly{0%{transform:translateY(0px) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}100%{transform:translateY(0px) rotate(-3deg)}}"}</style>
       {show&&msg&&(
-        <div style={{position:"fixed",bottom:80,right:12,background:"#fff",border:"2px solid #C41E1E",borderRadius:12,padding:"12px 14px 10px",fontSize:11,color:"#333",width:190,textAlign:"center",zIndex:9999,boxShadow:"0 4px 16px rgba(0,0,0,0.22)",lineHeight:1.7}}>
+        <div style={{position:"absolute",right:"108%",top:"50%",transform:"translateY(-50%)",background:"#fff",border:"2px solid #C41E1E",borderRadius:12,padding:"12px 14px 10px",fontSize:11,color:"#333",width:160,textAlign:"center",zIndex:9999,boxShadow:"0 4px 16px rgba(0,0,0,0.22)",lineHeight:1.7,whiteSpace:"normal"}}>
           <div style={{fontSize:10,color:"#C41E1E",fontWeight:700,marginBottom:5}}>ヒダネ鳥より</div>
           {msg}
+          <div style={{position:"absolute",right:-11,top:"50%",transform:"translateY(-50%)",width:0,height:0,borderTop:"9px solid transparent",borderBottom:"9px solid transparent",borderLeft:"11px solid #C41E1E"}}/>
+          <div style={{position:"absolute",right:-8,top:"50%",transform:"translateY(-50%)",width:0,height:0,borderTop:"7px solid transparent",borderBottom:"7px solid transparent",borderLeft:"9px solid #fff"}}/>
           <button onClick={function(){setShow(false);}} style={{position:"absolute",top:6,right:8,background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#bbb",lineHeight:1,padding:0}}>✕</button>
         </div>
       )}
@@ -511,7 +513,7 @@ function CheckScr(p){
         <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4}}>今月の平均達成率</div>
         <PersonFigure rate={avg} size={50} dance={avg>=100}/>
         <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
-        <div style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)"}}>
+        <div style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",zIndex:5}}>
           <BirdMascot avg={avg} y={y} m={m}/>
         </div>
       </div>
