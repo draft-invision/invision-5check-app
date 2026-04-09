@@ -104,6 +104,42 @@ function userAvgRate(user,y,m){
   return Math.round(sum/habs.length);
 }
 
+function BirdMascot(p){
+  var avg=p.avg,y=p.y,m=p.m;
+  var monthKey=y+"-"+m;
+  var showArr=useState(function(){
+    var shown=localStorage.getItem("iv5-bird")===monthKey;
+    if(!shown&&avg>=20){localStorage.setItem("iv5-bird",monthKey);return true;}
+    return false;
+  });
+  var show=showArr[0],setShow=showArr[1];
+  var msg=avg>=100?"目標達成、おめでとうございます！！"
+    :avg>=90?"ラストスパート！気を抜かずもうひと踏ん張り頑張ってください！"
+    :avg>=70?"ゴールが見えてきました！ここが踏ん張りどころです！"
+    :avg>=50?"ついに折り返し地点！この調子で後半も進めていきましょう。"
+    :avg>=20?"序盤戦、順調です！働く幸せを感じるかっこいい大人を目指して頑張りましょう。"
+    :null;
+  return(
+    <div style={{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"center"}}>
+      <style>{"@keyframes birdFly{0%{transform:translateY(0px) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}100%{transform:translateY(0px) rotate(-3deg)}}"}</style>
+      {show&&msg&&(
+        <div style={{position:"absolute",bottom:"110%",left:"50%",transform:"translateX(-50%)",background:"#fff",border:"2px solid #C41E1E",borderRadius:10,padding:"10px 12px 8px",fontSize:10,color:"#333",width:155,textAlign:"center",zIndex:10,boxShadow:"0 3px 10px rgba(0,0,0,0.18)",lineHeight:1.6}}>
+          {msg}
+          <div style={{position:"absolute",bottom:-11,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"9px solid transparent",borderRight:"9px solid transparent",borderTop:"11px solid #C41E1E"}}/>
+          <div style={{position:"absolute",bottom:-8,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"7px solid transparent",borderRight:"7px solid transparent",borderTop:"9px solid #fff"}}/>
+          <button onClick={function(){setShow(false);}} style={{position:"absolute",top:4,right:6,background:"none",border:"none",cursor:"pointer",fontSize:11,color:"#bbb",lineHeight:1,padding:0}}>✕</button>
+        </div>
+      )}
+      <img
+        src="https://s3-ap-northeast-1.amazonaws.com/stg.hr-hacker.com/job_offers/179938/main1_lj5jg9adfk7no12hbsca.png"
+        alt="mascot"
+        style={{width:58,height:"auto",animation:"birdFly 2s ease-in-out infinite",display:"block",cursor:msg?"pointer":"default"}}
+        onClick={function(){if(msg)setShow(function(s){return!s;});}}
+      />
+    </div>
+  );
+}
+
 var _pid=0;
 function PersonFigure(p){
   var rate=p.rate,size=p.size||80,dance=p.dance;
@@ -469,10 +505,15 @@ function CheckScr(p){
           </div>
         );
       })}
-      <div style={{...st.cd,textAlign:"center",marginTop:14}}>
-        <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4}}>今月の平均達成率</div>
-        <PersonFigure rate={avg} size={50} dance={avg>=100}/>
-        <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
+      <div style={{...st.cd,marginTop:14}}>
+        <div style={{fontSize:11,color:"#8B7E6A",marginBottom:4,textAlign:"center"}}>今月の平均達成率</div>
+        <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:18,paddingBottom:4}}>
+          <div style={{textAlign:"center"}}>
+            <PersonFigure rate={avg} size={50} dance={avg>=100}/>
+            <div style={{fontSize:24,fontWeight:900,color:avg>=80?"#C41E1E":"#1B4B8A",animation:avg>=80?"pulse80 1s infinite":"none",marginTop:4}}>{avg}%</div>
+          </div>
+          <BirdMascot avg={avg} y={y} m={m}/>
+        </div>
       </div>
     </div></div>
   );
