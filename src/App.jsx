@@ -115,12 +115,7 @@ function BirdMascot(p){
     var ref=prevThrRef.current;
     if(ref.key!==monthKey){ref.key=monthKey;ref.thr=0;}
     var thr=getThr(avg);
-    var stored=parseInt(localStorage.getItem("iv5-bird-"+monthKey)||"0");
-    if(thr>ref.thr&&thr>stored){
-      localStorage.setItem("iv5-bird-"+monthKey,String(thr));
-      ref.thr=thr;
-      setShow(true);
-    }
+    if(thr>ref.thr){ref.thr=thr;setShow(true);}
   },[avg,monthKey]);
   var msg=avg>=100?"目標達成、おめでとうございます！！"
     :avg>=90?"ラストスパート！気を抜かずもうひと踏ん張り頑張ってください！"
