@@ -399,20 +399,28 @@ function JobtripScr(p){
   var isAdmin=p.isAdmin;
   var editorRef=useRef(null);
   var _smsg=useState("");var smsg=_smsg[0],setSMsg=_smsg[1];
+  var _loading=useState(true);var loading=_loading[0],setLoading=_loading[1];
 
   useEffect(function(){
-    if(editorRef.current){
-      var saved=localStorage.getItem("iv5-jobtrip");
-      editorRef.current.innerHTML=saved||"<h2>JOBTRIPとは？</h2><p>ここに内容を入力してください。</p>";
-    }
+    supabase.from("settings").select("value").eq("key","jobtrip_content").maybeSingle()
+      .then(function(res){
+        var html=(res.data&&res.data.value)||"<h2>JOBTRIPとは？</h2><p>ここに内容を入力してください。</p>";
+        if(editorRef.current)editorRef.current.innerHTML=html;
+        setLoading(false);
+      });
   },[]);
 
   var execCmd=function(cmd,val){document.execCommand(cmd,false,val||null);editorRef.current&&editorRef.current.focus();};
 
   var saveContent=function(){
     if(editorRef.current){
-      localStorage.setItem("iv5-jobtrip",editorRef.current.innerHTML);
-      setSMsg("✅ 保存しました");setTimeout(function(){setSMsg("");},2000);
+      var html=editorRef.current.innerHTML;
+      supabase.from("settings").upsert({key:"jobtrip_content",value:html},{onConflict:"key"})
+        .then(function(res){
+          if(res.error){setSMsg("❌ 保存に失敗しました");}
+          else{setSMsg("✅ 保存しました");}
+          setTimeout(function(){setSMsg("");},2000);
+        });
     }
   };
 
@@ -423,6 +431,7 @@ function JobtripScr(p){
   return(
     <div style={st.mn} className="iv-mn"><div>
       <h2 style={st.tt}>JOBTRIPとは？</h2>
+      {loading&&<div style={{color:"#8B7E6A",fontSize:12,marginBottom:8}}>読み込み中...</div>}
       {smsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{smsg}</div>}
       {isAdmin&&(
         <div style={{...st.cd,marginBottom:8}}>
