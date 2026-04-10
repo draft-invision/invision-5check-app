@@ -404,6 +404,7 @@ function JobtripScr(p){
   useEffect(function(){
     supabase.from("settings").select("value").eq("key","jobtrip_content").maybeSingle()
       .then(function(res){
+        if(res.error){console.error("[JOBTRIP load error]",res.error);setSMsg("❌ 読み込みエラー: "+res.error.message);setLoading(false);return;}
         var html=(res.data&&res.data.value)||"<h2>JOBTRIPとは？</h2><p>ここに内容を入力してください。</p>";
         if(editorRef.current)editorRef.current.innerHTML=html;
         setLoading(false);
