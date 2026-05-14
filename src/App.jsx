@@ -605,12 +605,36 @@ function DashScr(p){
   var fl=filt==="all"?allU:allU.filter(function(u){return u.team===filt;});
   var gCC=function(u,d){var hs=getActiveHabits(u,y,m);return hs.filter(function(_,i){return u.checks&&u.checks[i+"-"+d];}).length;};
 
+  var downloadCSV=function(){
+    var headers=["月","名前","チーム名","習慣1","習慣2","習慣3","習慣4","習慣5","習慣1_頻度","習慣2_頻度","習慣3_頻度","習慣4_頻度","習慣5_頻度","習慣1_達成率","習慣2_達成率","習慣3_達成率","習慣4_達成率","習慣5_達成率"];
+    var monthLabel=pLabel(pKey(y,m));
+    var rows=[headers];
+    fl.forEach(function(u){
+      var hs=getActiveHabits(u,y,m);
+      var row=[monthLabel,u.name||"",u.team||""];
+      for(var j=0;j<5;j++){row.push(hs[j]?hs[j].name:"");}
+      for(var j=0;j<5;j++){
+        if(hs[j]){var fq=FREQS.find(function(f){return f.value===hs[j].freq;});var fl3=fq?fq.label:"";if(hs[j].freq!=="daily"&&(hs[j].count||1)>1)fl3+=(hs[j].count||1)+"回";row.push(fl3);}
+        else{row.push("");}
+      }
+      for(var j=0;j<5;j++){row.push(hs[j]?calcRate(u.checks||{},j,hs[j].freq,hs[j].count||1,y,m)+"%":"");}
+      rows.push(row);
+    });
+    var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");a.href=url;a.download=monthLabel+"_行動習慣.csv";a.click();URL.revokeObjectURL(url);
+  };
+
   return(
     <div style={st.mn} className="iv-mn"><div>
       <h2 style={st.tt}>📊 全社ダッシュボード</h2>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:14}}>
         <MNav year={y} month={m} onChange={setSm}/>
-        <div style={{display:"flex",gap:3,flexWrap:"wrap"}}><button onClick={function(){setFilt("all");setSelU(null);}} style={{...st.fb,...(filt==="all"?st.fa:{})}}>全社</button>{uT.map(function(t){return <button key={t} onClick={function(){setFilt(t);setSelU(null);}} style={{...st.fb,...(filt===t?st.fa:{})}}>{t}</button>;})}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-end"}}>
+          <div style={{display:"flex",gap:3,flexWrap:"wrap"}}><button onClick={function(){setFilt("all");setSelU(null);}} style={{...st.fb,...(filt==="all"?st.fa:{})}}>全社</button>{uT.map(function(t){return <button key={t} onClick={function(){setFilt(t);setSelU(null);}} style={{...st.fb,...(filt===t?st.fa:{})}}>{t}</button>;})}</div>
+          <button onClick={downloadCSV} style={{...st.fb,fontSize:10,color:"#1B4B8A",borderColor:"#1B4B8A"}}>⬇ CSVダウンロード</button>
+        </div>
       </div>
       {fl.map(function(u,ui){
         var rate=userAvgRate(u,y,m);var hi=rate>=80;var sel=selU===ui;var hs=getActiveHabits(u,y,m);
