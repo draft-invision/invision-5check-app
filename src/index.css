@@ -130,11 +130,26 @@ code {
   }
 }
 
-/* ── JOBTRIPエディター 本文スタイル ── */
+/* ── JOBTRIPエディター 文字サイズ ── */
+.iv-jobtrip-editor h1 {
+  font-size: 95px;
+}
+.iv-jobtrip-editor h2 {
+  font-size: 41px;
+}
 .iv-jobtrip-editor p {
-  font-size: 12px;
+  font-size: 20px;
   font-weight: 300;
   margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .iv-jobtrip-editor h1 {
+    font-size: 61px;
+  }
+  .iv-jobtrip-editor h2 {
+    font-size: 34px;
+  }
 }
 
 /* ── ヘッダーナビ余白 ── */
