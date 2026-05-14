@@ -425,12 +425,12 @@ function JobtripScr(p){
     }
   };
 
-  var COLORS=[["#000000","黒"],["#1B4B8A","青"],["#C41E1E","赤"],["#2e7d32","緑"],["#e65100","橙"],["#8B7E6A","茶"]];
+  var COLORS=[["#000000","黒"],["#555555","濃グレー"],["#1B4B8A","青"],["#C41E1E","赤"],["#2e7d32","緑"],["#e65100","橙"],["#8B7E6A","茶"]];
 
   var tbBtn=function(label,onClick,extra){return <button onClick={onClick} style={{border:"1px solid #ddd",borderRadius:4,cursor:"pointer",padding:"3px 8px",fontSize:11,fontFamily:"inherit",background:"#fff",color:"#333",...(extra||{})}}>{label}</button>;};
 
   return(
-    <div style={st.mn} className="iv-mn"><div>
+    <div style={{...st.mn,textAlign:"left"}} className="iv-mn"><div>
       <h2 style={st.tt}>JOBTRIPとは？</h2>
       {loading&&<div style={{color:"#8B7E6A",fontSize:12,marginBottom:8}}>読み込み中...</div>}
       {smsg&&<div style={{background:"#e8f5e9",color:"#2e7d32",padding:"6px 10px",borderRadius:6,marginBottom:10,fontSize:12,textAlign:"center"}}>{smsg}</div>}
@@ -448,7 +448,7 @@ function JobtripScr(p){
         </div>
       )}
       <div style={st.cd}>
-        <div ref={editorRef} contentEditable={isAdmin} suppressContentEditableWarning={true} style={{minHeight:300,outline:"none",fontSize:13,lineHeight:2,color:"#333",wordBreak:"break-word"}}/>
+        <div ref={editorRef} contentEditable={isAdmin} suppressContentEditableWarning={true} className="iv-jobtrip-editor" style={{minHeight:300,outline:"none",fontSize:13,lineHeight:2,color:"#333",wordBreak:"break-word"}}/>
       </div>
       {isAdmin&&<button onClick={saveContent} style={st.pb}>保存</button>}
     </div></div>
