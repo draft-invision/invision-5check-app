@@ -514,9 +514,10 @@ function CheckScr(p){
         <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"#8B7E6A"}}>今日</div><div style={{fontSize:20,fontWeight:900,color:pr>=0.8?"#C41E1E":"#1B4B8A"}}>{tc}/{aH.length}</div></div>
         {pr>=1&&<div style={{position:"absolute",top:3,right:6,fontSize:8,background:"#C41E1E",color:"#fff",padding:"1px 5px",borderRadius:6,fontWeight:700}}>🎉 全達成！</div>}
       </div>
-      <MNav year={y} month={m} onChange={setSm}/>
-      <div style={{textAlign:"left",margin:"-8px 0",paddingLeft:150,position:"relative",zIndex:10,pointerEvents:"none"}}>
-        <img src={kumo2Png} alt="" style={{width:160,height:"auto",display:"inline-block"}}/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <MNav year={y} month={m} onChange={setSm}/>
+        <style>{"@keyframes kumo2Float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-8px)}}"}</style>
+        <img src={kumo2Png} alt="" style={{width:95,height:42,display:"block",pointerEvents:"none",animation:"kumo2Float 3s ease-in-out infinite"}}/>
       </div>
       {aH.length===0&&<div style={st.cd}><p style={{color:"#8B7E6A",fontSize:12,textAlign:"center"}}>この期間の行動習慣が未設定です。「習慣管理」から設定してください。</p></div>}
       {aH.map(function(hab,i){
